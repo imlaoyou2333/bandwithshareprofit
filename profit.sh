@@ -28,40 +28,40 @@ if [ $INSTALL_PACKETSTREAM == "y" ]
  cat > $INSTALL_DIR"/psclient/pslauncher" <<EOF
 #!/bin/sh
 
-arch=$(uname -m)
+arch=\$(uname -m)
 
 # Sleep 10s to prevent tight loop in case of failure
-echo "PacketStream client is starting..."
+echo \"PacketStream client is starting...\"
 sleep 10
 
 case $arch in
   x86_64)
-    echo "Starting x86_64 client..."
-    exec $INSTALL_DIR/psclient/linux_amd64/psclient "$@"
+    echo \"Starting x86_64 client...\"
+    exec $INSTALL_DIR/psclient/linux_amd64/psclient \"\$@\"
     ;;
   i386)
-    echo "Starting i386 client..."
-    exec $INSTALL_DIR/psclient/linux_386/psclient "$@"
+    echo \"Starting i386 client...\"
+    exec $INSTALL_DIR/psclient/linux_386/psclient \"\$@\"
     ;;
   armv6l)
-    echo "Starting armv6l client..."
-    exec $INSTALL_DIR/psclient/linux_arm/psclient "$@"
+    echo \"Starting armv6l client...\"
+    exec $INSTALL_DIR/psclient/linux_arm/psclient \"\$@\"
     ;;
   armv7l)
-    echo "Starting armv7l client..."
-    exec $INSTALL_DIR/psclient/linux_arm/psclient "$@"
+    echo \"Starting armv7l client...\"
+    exec $INSTALL_DIR/psclient/linux_arm/psclient \"\$@\"
     ;;
   armv8l)
-    echo "Starting armv8l client..."
-    exec $INSTALL_DIR/psclient/linux_arm/psclient "$@"
+    echo \"Starting armv8l client...\"
+    exec $INSTALL_DIR/psclient/linux_arm/psclient \"\$@\"
     ;;
   aarch64)
-    echo "Starting aarch64 client..."
+    echo \"Starting aarch64 client...\"
     # Uses 32-bit binary due to compatibility issues on some devices
-    exec $INSTALL_DIR/psclient/linux_arm/psclient "$@"
+    exec $INSTALL_DIR/psclient/linux_arm/psclient \"\$@\"
     ;;
   *)
-    echo "Unsupported architecture: $arch"
+    echo \"Unsupported architecture: \$arch\"
     exit 1
     ;;
 esac
