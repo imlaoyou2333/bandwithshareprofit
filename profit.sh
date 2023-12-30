@@ -36,8 +36,8 @@ After=network.target
 
 [Service]
 Type=simple
-EnvironmentFile=$INSTALL_DIR/config
-ExecStart=$INSTALL_DIR/psclient
+EnvironmentFile=$INSTALL_DIR/psclient/config
+ExecStart=$INSTALL_DIR/psclient/psclient
 
 [Install]
 WantedBy = multi-user.target
