@@ -2,20 +2,30 @@
 
 ## Var start
 DEBUG="n"
-INSTALL_DIR=""
+INSTALL_DIR="/usr/local/bin"
 DL_WEB="https://raw.githubusercontent.com/imlaoyou2333/bandwithshareprofit/main"
 # PacketStream
 INSTALL_PACKETSTREAM="n"
 PS_CID="6wV"
+# Bitping
+INSTALL_BITPING="n"
 
 ## Var end
 
 #read Var
 for i in "$@"; do
-    [ $DEBUG == "y" ] && echo "[DEBUG]typed:"$i
+    [ $DEBUG == "y" ] && echo "[DEBUG]typed:"$i 
     [ $i == "help" ] && echo -e "help: \ninfo"
+    [[ $i =~ ^install_dir=.*$ ]] && INSTALL_DIR=${i#*install_dir=}
+    # packetstream
     [ $i == "packetstream" ] && INSTALL_PACKETSTREAM="y"
+    [[ $i =~ ^ps_cid=.*$ ]] && PS_CID=${i#*ps_cid=}
+    # bitping
+    [ $i == "bitping" ] && INSTALL_BITPING="y"
+    [[ $i =~ ^bitping_mail=.*$ ]] && BITPING_MAIL=${i#*bitping_mail=}
+    [[ $i =~ ^bitping_pass=.*$ ]] && BITPING_PASS=${i#*bitping_pass=}
 done
+# Install Packetstream
 if [ $INSTALL_PACKETSTREAM == "y" ]
  then
  echo 'We will install Packetstream'
@@ -92,4 +102,38 @@ EOF
  systemctl enable psclient
  systemctl start psclient
  echo "Packetstream done!"
+fi
+
+#Install Bitping
+if [ $INSTALL_BITPING == "y" ]
+ then
+ [ -d $INSTALL_DIR"/bitping/" ] && echo "already exist, remove it" && rm -rf $INSTALL_DIR"/bitping"
+ wget -P $INSTALL_DIR/bitping https://downloads.bitping.com/node/linux.zip
+ unzip -d $INSTALL_DIR/bitping $INSTALL_DIR/bitping/linux.zip
+ mv $INSTALL_DIR/bitping/release/bitping-node-amd64-linux $INSTALL_DIR/bitping/
+ rm -rf $INSTALL_DIR/bitping/release
+ cat > $INSTALL_DIR/bitping/config <<EOF
+BITPING_MAIL=$BITPING_MAIL
+BITPING_PASS=$BITPING_PASS
+EOF
+ cat > /usr/lib/systemd/system/bitping-node.service <<EOF
+[Unit]
+Description=Bitping node
+After=network.target
+
+[Service]
+Type=simple
+EnvironmentFile=$INSTALL_DIR/bitping/config
+ExecStart=$INSTALL_DIR/bitping/bitping-node-amd64-linux --email \$BITPING_MAIL --password \$BITPING_PASS --server
+WorkingDirectory=$INSTALL_DIR/bitping/
+User=root
+Group=root
+
+[Install]
+WantedBy = multi-user.target
+EOF
+ systemctl daemon-reload
+ systemctl enable bitping-node
+ systemctl start bitping-node
+ echo "Bitping done!"
 fi
