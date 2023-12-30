@@ -34,7 +34,7 @@ arch=\$(uname -m)
 echo "PacketStream client is starting..."
 sleep 10
 
-case $arch in
+case \$arch in
   x86_64)
     echo "Starting x86_64 client..."
     exec $INSTALL_DIR/psclient/linux_amd64/psclient "\$@"
@@ -67,8 +67,8 @@ case $arch in
 esac
 EOF
  cat > $INSTALL_DIR/psclient/config <<EOF
-PS_IS_DOCKER true
-CID $PS_CID
+PS_IS_DOCKER=true
+CID=$PS_CID
 EOF
  cat > /usr/lib/systemd/system/psclient.service <<EOF
 [Unit]
@@ -79,6 +79,9 @@ After=network.target
 Type=simple
 EnvironmentFile=$INSTALL_DIR/psclient/config
 ExecStart=$INSTALL_DIR/psclient/pslauncher
+WorkingDirectory=$INSTALL_DIR/psclient
+User=root
+Group=root
 
 [Install]
 WantedBy = multi-user.target
