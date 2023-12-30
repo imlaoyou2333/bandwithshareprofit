@@ -67,6 +67,7 @@ case $arch in
 esac
 EOF
  cat > $INSTALL_DIR/psclient/config <<EOF
+PS_IS_DOCKER true
 CID $PS_CID
 EOF
  cat > /usr/lib/systemd/system/psclient.service <<EOF
