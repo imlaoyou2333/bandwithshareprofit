@@ -1,10 +1,15 @@
 #!/bin/bash
 
-##Var start
+## Var start
 DEBUG="n"
 INSTALL_DIR=""
 DL_WEB="https://raw.githubusercontent.com/imlaoyou2333/bandwithshareprofit/main"
+# PacketStream
 INSTALL_PACKETSTREAM="n"
+PS_CID="6wV"
+
+## Var end
+
 #read Var
 for i in "$@"; do
     [ $DEBUG == "y" ] && echo "[DEBUG]typed:"$i
@@ -21,4 +26,24 @@ if [ $INSTALL_PACKETSTREAM == "y" ]
  wget -P $INSTALL_DIR"/psclient/linux_amd64/" $DL_WEB"/psclient/linux_amd64/psclient"
  wget -P $INSTALL_DIR"/psclient/linux_arm/" $DL_WEB"/psclient/linux_arm/psclient"
  wget -P $INSTALL_DIR"/psclient/linux_arm64/" $DL_WEB"/psclient/linux_arm64/psclient"
+ cat > $INSTALL_DIR/psclient/config <<EOF
+CID $PS_CID
+EOF
+ cat > /usr/lib/systemd/system/psclient.service <<EOF
+[Unit]
+Description=Packetstream Client
+After=network.target
+
+[Service]
+Type=simple
+EnvironmentFile=$INSTALL_DIR/config
+ExecStart=$INSTALL_DIR/psclient
+
+[Install]
+WantedBy = multi-user.target
+EOF
+ systemctl daemon-reload
+ systemctl enable psclient
+ systemctl start psclient
+ echo "Packetstream done!"
 fi
