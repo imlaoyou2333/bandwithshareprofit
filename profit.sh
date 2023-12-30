@@ -78,7 +78,7 @@ After=network.target
 [Service]
 Type=simple
 EnvironmentFile=$INSTALL_DIR/psclient/config
-ExecStart=$INSTALL_DIR/psclient/psclient
+ExecStart=$INSTALL_DIR/psclient/pslauncher
 
 [Install]
 WantedBy = multi-user.target
