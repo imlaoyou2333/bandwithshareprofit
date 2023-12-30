@@ -31,40 +31,44 @@ if [ $INSTALL_PACKETSTREAM == "y" ]
 arch=\$(uname -m)
 
 # Sleep 10s to prevent tight loop in case of failure
-echo \"PacketStream client is starting...\"
+echo "PacketStream client is starting..."
 sleep 10
 
-case \$arch in
+case $arch in
   x86_64)
-    echo \"Starting x86_64 client...\"
-    PS_IS_DOCKER=true CID=$PS_CID exec $INSTALL_DIR/psclient/linux_amd64/psclient \"\$@\"
+    echo "Starting x86_64 client..."
+    exec $INSTALL_DIR/psclient/linux_amd64/psclient "\$@"
     ;;
   i386)
-    echo \"Starting i386 client...\"
-    PS_IS_DOCKER=true CID=$PS_CID exec $INSTALL_DIR/psclient/linux_386/psclient \"\$@\"
+    echo "Starting i386 client..."
+    exec $INSTALL_DIR/psclient/linux_386/psclient "\$@"
     ;;
   armv6l)
-    echo \"Starting armv6l client...\"
-    PS_IS_DOCKER=true CID=$PS_CID exec $INSTALL_DIR/psclient/linux_arm/psclient \"\$@\"
+    echo "Starting armv6l client..."
+    exec $INSTALL_DIR/psclient/linux_arm/psclient "\$@"
     ;;
   armv7l)
-    echo \"Starting armv7l client...\"
-    PS_IS_DOCKER=true CID=$PS_CID exec $INSTALL_DIR/psclient/linux_arm/psclient \"\$@\"
+    echo "Starting armv7l client..."
+    exec $INSTALL_DIR/psclient/linux_arm/psclient "\$@"
     ;;
   armv8l)
-    echo \"Starting armv8l client...\"
-    PS_IS_DOCKER=true CID=$PS_CID exec $INSTALL_DIR/psclient/linux_arm/psclient \"\$@\"
+    echo "Starting armv8l client..."
+    exec $INSTALL_DIR/psclient/linux_arm/psclient "\$@"
     ;;
   aarch64)
-    echo \"Starting aarch64 client...\"
+    echo "Starting aarch64 client..."
     # Uses 32-bit binary due to compatibility issues on some devices
-    PS_IS_DOCKER=true CID=$PS_CID exec $INSTALL_DIR/psclient/linux_arm/psclient \"\$@\"
+    exec $INSTALL_DIR/psclient/linux_arm/psclient "\$@"
     ;;
   *)
-    echo \"Unsupported architecture: \$arch\"
+    echo "Unsupported architecture: \$arch"
     exit 1
     ;;
 esac
+EOF
+ cat > $INSTALL_DIR/psclient/config <<EOF
+PS_IS_DOCKER true
+CID $PS_CID
 EOF
  cat > /usr/lib/systemd/system/psclient.service <<EOF
 [Unit]
@@ -73,6 +77,7 @@ After=network.target
 
 [Service]
 Type=simple
+EnvironmentFile=$INSTALL_DIR/psclient/config
 ExecStart=$INSTALL_DIR/psclient/pslauncher
 
 [Install]
