@@ -246,7 +246,8 @@ if ! [[ -d $INSTALL_DIR/proxylite ]]; then
 	rm $INSTALL_DIR/proxylite/service/netcoreapp-latest.tar
 	
 	echo "Creating systemd daemon"
-	echo '[Unit]
+	cat > /etc/systemd/system/proxylite.service <<EOF
+[Unit]
 Description=ProxyLite ProxyService
 After=network.target
 
@@ -260,7 +261,8 @@ WorkingDirectory=$INSTALL_DIR/proxylite/service
 ExecStart=$INSTALL_DIR/proxylite/dotnet60/dotnet $INSTALL_DIR/proxylite/service/ProxyService.Core.dll
 
 [Install]
-WantedBy=multi-user.target' > /etc/systemd/system/proxylite.service;
+WantedBy=multi-user.target
+EOF
 	echo "Reloading systemd daemons"
 	systemctl daemon-reload
 	echo "Enabling ProxyLite daemon"
