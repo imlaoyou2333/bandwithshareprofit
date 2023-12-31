@@ -6,10 +6,20 @@ INSTALL_DIR="/usr/local/bin"
 DL_WEB="https://raw.githubusercontent.com/imlaoyou2333/bandwithshareprofit/main"
 # PacketStream
 INSTALL_PACKETSTREAM="n"
-PS_CID="6wV"
+PS_CID=""
 # Bitping
 INSTALL_BITPING="n"
 
+
+# Traffmonetizer
+INSTALL_TRAFFMOTIZER="n"
+TRAFFMONETIZER_TOKEN=""
+#EarnFM
+INSTALL_EARNFM="n"
+EARNFM_TOKEN=""
+#ProxyLite
+INSTALL_PROXYLITE="n"
+PROXYLITE_TOKEN=""
 ## Var end
 
 #read Var
@@ -24,6 +34,15 @@ for i in "$@"; do
     [ $i == "bitping" ] && INSTALL_BITPING="y"
     [[ $i =~ ^bitping_mail=.*$ ]] && BITPING_MAIL=${i#*bitping_mail=}
     [[ $i =~ ^bitping_pass=.*$ ]] && BITPING_PASS=${i#*bitping_pass=}
+    # traffmotizer
+    [ $i == "traffmonetizer" ] && INSTALL_TRAFFMONETIZER="y"
+    [[ $i =~ ^traffmonetizer_token=.*$ ]] && TRAFFMONETIZER_TOKEN=${i#*traffmonetizer_token=}
+    # EarnFM
+    [ $i == "earnfm" ] && INSTALL_EARNFM="y"
+    [[ $i =~ ^earnfm_token=.*$ ]] && EARNFM_TOKEN=${i#*earnfm_token=}
+    # ProxyLite
+    [ $i == "proxylite" ] && INSTALL_PROXYLITE="y"
+    [[ $i =~ ^proxylite_token=.*$ ]] && PROXYLITE_TOKEN=${i#*proxylite_token=}
 done
 # Install Packetstream
 if [ $INSTALL_PACKETSTREAM == "y" ]
@@ -136,4 +155,134 @@ EOF
  systemctl enable bitping-node
  systemctl start bitping-node
  echo "Bitping done!"
+fi
+
+# Install Traffmonetizer
+if [ $INSTALL_TRAFFMONETIZER == "y" ]
+ then
+ [ -d $INSTALL_DIR"/traffmonetizer/" ] && echo "already exist, remove it" && rm -rf $INSTALL_DIR"/traffmonetizer"
+ wget -P $INSTALL_DIR"/traffmonetizer/" $DL_WEB"/traffmonetizer/Cli"
+ cat > $INSTALL_DIR/traffmonetizer/config <<EOF
+ASPNETCORE_URLS=http://+:80
+DOTNET_RUNNING_IN_CONTAINER=true
+DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=true
+DOTNET_CLI_TELEMETRY_OPTOUT=1
+TRAFFMONETIZER_TOKEN=$TRAFFMONETIZER_TOKEN
+EOF
+ cat > /usr/lib/systemd/system/traffmonetizer.service <<EOF
+[Unit]
+Description=Traffmonetizer Cli
+After=network.target
+
+[Service]
+Type=simple
+EnvironmentFile=$INSTALL_DIR/traffmonetizer/config
+ExecStart=$INSTALL_DIR/traffmonetizer/Cli start accept --token $TRAFFMONETIZER_TOKEN
+WorkingDirectory=$INSTALL_DIR/traffmonetizer/
+User=root
+Group=root
+
+[Install]
+WantedBy = multi-user.target
+EOF
+ systemctl daemon-reload
+ systemctl enable traffmonetizer
+ systemctl start traffmonetizer
+ echo "Traffmonetizer done!"
+fi
+#Install EarnFM
+if [ $INSTALL_EARNFM == "y" ]
+ then
+ [ -d $INSTALL_DIR"/earnfm/" ] && echo "already exist, remove it" && rm -rf $INSTALL_DIR"/earnfm"
+ wget -P $INSTALL_DIR"/earnfm/" $DL_WEB"/earnfm/earnfm_example"
+ cat > $INSTALL_DIR/earnfm/config <<EOF
+EARNFM_TOKEN=$EARNFM_TOKEN
+EOF
+ cat > /usr/lib/systemd/system/earnfm.service <<EOF
+[Unit]
+Description=EarnFM Cli
+After=network.target
+
+[Service]
+Type=simple
+EnvironmentFile=$INSTALL_DIR/earnfm/config
+ExecStart=$INSTALL_DIR/earnfm/earnfm_example
+WorkingDirectory=$INSTALL_DIR/earnfm/
+User=root
+Group=root
+
+[Install]
+WantedBy = multi-user.target
+EOF
+ systemctl daemon-reload
+ systemctl enable earnfm
+ systemctl start earnfm
+ echo "EarnFM done!"
+fi
+
+# Install ProxyLite
+if [ $INSTALL_PROXYLITE == "y" ]
+ then
+ echo "Checking ProxyLite Installation";
+
+if ! [[ -d $INSTALL_DIR/proxylite ]]; then
+	echo "Creating folders";
+	
+	mkdir $INSTALL_DIR/proxylite
+	mkdir $INSTALL_DIR/proxylite/dotnet60
+	mkdir $INSTALL_DIR/proxylite/service
+	echo $PROXYLITE_TOKEN > $INSTALL_DIR/proxylite/service/userid.ini
+	
+	echo "Downloading .NET 6.0"
+	wget https://app.proxylite.ru/thirdparty/dotnet-runtime-6.0.10-linux-x64.tar.gz -P $INSTALL_DIR/proxylite/dotnet60 2> /dev/null 1>/dev/null
+	echo "Downloading ProxyService"
+	wget https://app.proxylite.ru/netcoreapp-latest.tar -P $INSTALL_DIR/proxylite/service 2> /dev/null 1>/dev/null
+	echo "Unpacking .NET 6.0"
+	tar xf $INSTALL_DIR/proxylite/dotnet60/dotnet-runtime-6.0.10-linux-x64.tar.gz -C $INSTALL_DIR/proxylite/dotnet60
+	rm $INSTALL_DIR/proxylite/dotnet60/dotnet-runtime-6.0.10-linux-x64.tar.gz
+	chmod +x $INSTALL_DIR/proxylite/dotnet60/dotnet
+	echo "Unpacking ProxyService"
+	tar xf $INSTALL_DIR/proxylite/service/netcoreapp-latest.tar -C $INSTALL_DIR/proxylite/service
+	rm $INSTALL_DIR/proxylite/service/netcoreapp-latest.tar
+	
+	echo "Creating systemd daemon"
+	echo '[Unit]
+Description=ProxyLite ProxyService
+After=network.target
+
+[Service]
+StartLimitInterval=0
+StandardOutput=null
+LimitNOFILE=1008575
+Restart=always
+RestartSec=8
+WorkingDirectory=$INSTALL_DIR/proxylite/service
+ExecStart=$INSTALL_DIR/proxylite/dotnet60/dotnet $INSTALL_DIR/proxylite/service/ProxyService.Core.dll
+
+[Install]
+WantedBy=multi-user.target' > /etc/systemd/system/proxylite.service;
+	echo "Reloading systemd daemons"
+	systemctl daemon-reload
+	echo "Enabling ProxyLite daemon"
+	systemctl enable proxylite
+	echo "Starting ProxyLite daemon"
+	systemctl start proxylite
+	
+	echo "Successfily! You are installed ProxyLite on this system. You can check install by 'systemctl status proxylite'"
+	echo "If you want stop ProxyLite, you can use 'systemctl stop proxylite'"
+	echo "If you want remove ProxyLite, you should start this script with 'uninstall' argument"
+	
+else
+	echo "ProxyLite already installed";
+	$PROXYLITE_CURRENT_ID=$(cat $INSTALL_DIR/proxylite/service/userid.ini);
+	
+	if [[ $PROXYLITE_CURRENT_ID != $PROXYLITE_TOKEN ]]; then
+		echo "Presented ID $PROXYLITE_TOKEN is not match by current $PROXYLITE_CURRENT_ID";
+		echo "Restarting service";
+		echo $PROXYLITE_TOKEN > $INSTALL_DIR/proxylite/service/userid.ini
+		systemctl restart proxylite
+		
+	fi
+fi
+echo "ProxyLite Done!"
 fi
