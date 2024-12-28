@@ -4,17 +4,17 @@
 DEBUG="n"
 INSTALL_DIR="/usr/local/bin"
 DL_WEB="https://raw.githubusercontent.com/imlaoyou2333/bandwithshareprofit/main"
-# PacketStream
+#PacketStream
 INSTALL_PACKETSTREAM="n"
-PS_CID=""
+# PS_CID=""
 # Bitping
 INSTALL_BITPING="n"
-# Traffmonetizer
+#Traffmonetizer
 INSTALL_TRAFFMONETIZER="n"
-TRAFFMONETIZER_TOKEN=""
+# TRAFFMONETIZER_TOKEN=""
 #EarnFM
 INSTALL_EARNFM="n"
-EARNFM_TOKEN=""
+# EARNFM_TOKEN=""
 #ProxyLite
 INSTALL_PROXYLITE="n"
 PROXYLITE_TOKEN=""
@@ -29,18 +29,18 @@ for i in "$@"; do
     [ $i == "help" ] && echo -e "help: \ninfo"
     [[ $i =~ ^install_dir=.*$ ]] && INSTALL_DIR=${i#*install_dir=}
     # packetstream
-    [ $i == "packetstream" ] && INSTALL_PACKETSTREAM="y"
-    [[ $i =~ ^ps_cid=.*$ ]] && PS_CID=${i#*ps_cid=}
+    # [ $i == "packetstream" ] && INSTALL_PACKETSTREAM="y"
+    # [[ $i =~ ^ps_cid=.*$ ]] && PS_CID=${i#*ps_cid=}
     # bitping
     [ $i == "bitping" ] && INSTALL_BITPING="y"
     [[ $i =~ ^bitping_mail=.*$ ]] && BITPING_MAIL=${i#*bitping_mail=}
     [[ $i =~ ^bitping_pass=.*$ ]] && BITPING_PASS=${i#*bitping_pass=}
     # traffmotizer
-    [ $i == "traffmonetizer" ] && INSTALL_TRAFFMONETIZER="y"
-    [[ $i =~ ^traffmonetizer_token=.*$ ]] && TRAFFMONETIZER_TOKEN=${i#*traffmonetizer_token=}
+    # [ $i == "traffmonetizer" ] && INSTALL_TRAFFMONETIZER="y"
+    # [[ $i =~ ^traffmonetizer_token=.*$ ]] && TRAFFMONETIZER_TOKEN=${i#*traffmonetizer_token=}
     # EarnFM
-    [ $i == "earnfm" ] && INSTALL_EARNFM="y"
-    [[ $i =~ ^earnfm_token=.*$ ]] && EARNFM_TOKEN=${i#*earnfm_token=}
+    # [ $i == "earnfm" ] && INSTALL_EARNFM="y"
+    # [[ $i =~ ^earnfm_token=.*$ ]] && EARNFM_TOKEN=${i#*earnfm_token=}
     # ProxyLite
     [ $i == "proxylite" ] && INSTALL_PROXYLITE="y"
     [[ $i =~ ^proxylite_token=.*$ ]] && PROXYLITE_TOKEN=${i#*proxylite_token=}
