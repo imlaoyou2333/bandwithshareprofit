@@ -9,10 +9,8 @@ INSTALL_PACKETSTREAM="n"
 PS_CID=""
 # Bitping
 INSTALL_BITPING="n"
-
-
 # Traffmonetizer
-INSTALL_TRAFFMOTIZER="n"
+INSTALL_TRAFFMONETIZER="n"
 TRAFFMONETIZER_TOKEN=""
 #EarnFM
 INSTALL_EARNFM="n"
@@ -20,6 +18,9 @@ EARNFM_TOKEN=""
 #ProxyLite
 INSTALL_PROXYLITE="n"
 PROXYLITE_TOKEN=""
+#Proxyrack
+INSTALL_PROXYRACK="n"
+PROXYRACK_UUID=""
 ## Var end
 
 #read Var
@@ -43,6 +44,9 @@ for i in "$@"; do
     # ProxyLite
     [ $i == "proxylite" ] && INSTALL_PROXYLITE="y"
     [[ $i =~ ^proxylite_token=.*$ ]] && PROXYLITE_TOKEN=${i#*proxylite_token=}
+    # proxyrack
+    [ $i == "proxyrack" ] && INSTALL_PROXYRACK="y"
+    [[ $i =~ ^proxyrack_token=.*$ ]] && PROXYRACK_UUID=${i#*proxyrack_UUID=}
 done
 # Install Packetstream
 if [ $INSTALL_PACKETSTREAM == "y" ]
@@ -55,7 +59,6 @@ if [ $INSTALL_PACKETSTREAM == "y" ]
  wget -P $INSTALL_DIR"/psclient/linux_arm/" $DL_WEB"/psclient/linux_arm/psclient"
  wget -P $INSTALL_DIR"/psclient/linux_arm64/" $DL_WEB"/psclient/linux_arm64/psclient"
  cat > $INSTALL_DIR"/psclient/pslauncher" <<EOF
-#!/bin/sh
 
 arch=\$(uname -m)
 
@@ -185,11 +188,12 @@ Group=root
 [Install]
 WantedBy = multi-user.target
 EOF
- systemctl daemon-reload
- systemctl enable traffmonetizer
- systemctl start traffmonetizer
- echo "Traffmonetizer done!"
+systemctl daemon-reload
+systemctl enable traffmonetizer
+systemctl start traffmonetizer
+echo "Traffmonetizer done!"
 fi
+
 #Install EarnFM
 if [ $INSTALL_EARNFM == "y" ]
  then
@@ -287,4 +291,38 @@ else
 	fi
 fi
 echo "ProxyLite Done!"
+fi
+
+if [ $INSTALL_PROXYRACK == "y" ]
+then
+ [ -d $INSTALL_DIR"/proxyrack/" ] && echo "already exist, remove it" && rm -rf $INSTALL_DIR"/proxyrack"
+ if [ -z "$UUID" ]; then
+    PROXYRACK_UUID=$(cat /dev/urandom | LC_ALL=C tr -dc 'A-F0-9' | dd bs=1 count=64 2>/dev/null && echo)
+    echo "Your Proxyrack UUID is $PROXYRACK_UUID"
+    wget https://app-updates.sock.sh/peerclient/script/script.js -o $INSTALL_DIR/proxyrack/
+ fi
+ apt install -y nodejs npm
+ cat > $INSTALL_DIR/proxyrack/config <<EOF
+UUID=$PROXYRACK_UUID
+EOF
+ cat > /usr/lib/systemd/system/proxyrack.service <<EOF
+[Unit]
+Description=Proxyrack Point Of Presence
+After=network.target
+
+[Service]
+Type=simple
+EnvironmentFile=$INSTALL_DIR/proxyrack/config
+ExecStart=node script.js --homeIp point-of-presence.sock.sh --homePort 443 --id \$UUID --version $(curl --silent https://app-updates.sock.sh/peerclient/script/version.txt) --clientKey proxyrack-pop-client --clientType PoP
+WorkingDirectory=$INSTALL_DIR/proxyrack/
+User=root
+Group=root
+
+[Install]
+WantedBy = multi-user.target
+EOF
+systemctl daemon-reload
+systemctl enable proxyrack
+systemctl start proxyrack
+echo "Proxyrack done!"
 fi
