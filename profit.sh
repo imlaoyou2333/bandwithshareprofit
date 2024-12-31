@@ -25,7 +25,7 @@ PROXYRACK_UUID=""
 
 #Help
 for i in "$@"; do
-[ $i == "help" ] && echo -e "Bandwidthshare auto config tool without Docker. For tiny tiny VPS (especially low RAM NAT VPS).\nUsage: profit.sh project1 project2... config1=value1 config2=value2...\nExample: ./profit.sh proxylite proxyrack --proxylite_token=token  --proxyrack_token=token\nFor now support:\nBitping:\nbitping_mail=\nbitping_pass=\nProxyLite:\nproxylite_token=\nProxyrack:\nproxyrack_token=\n" && exit 0
+[ $i == "help" ] && echo -e "Bandwidthshare auto config tool without Docker. For tiny tiny VPS (especially low RAM NAT VPS).\nUsage: profit.sh project1 project2... config1=value1 config2=value2...\nExample: ./profit.sh proxylite proxyrack --proxylite_token=token  --proxyrack_uuid=uuid\nFor now support:\nBitping:\nbitping_mail=\nbitping_pass=\nProxyLite:\nproxylite_token=\nProxyrack:\nproxyrack_uuid=\n" && exit 0
 done
 
 #read Var
@@ -50,7 +50,7 @@ for i in "$@"; do
     [[ $i =~ ^proxylite_token=.*$ ]] && PROXYLITE_TOKEN=${i#*proxylite_token=}
     # proxyrack
     [ $i == "proxyrack" ] && INSTALL_PROXYRACK="y"
-    [[ $i =~ ^proxyrack_token=.*$ ]] && PROXYRACK_UUID=${i#*proxyrack_UUID=}
+    [[ $i =~ ^proxyrack_uuid=.*$ ]] && PROXYRACK_UUID=${i#*proxyrack_uuid=}
 done
 # Install Packetstream
 if [ $INSTALL_PACKETSTREAM == "y" ]
