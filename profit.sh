@@ -3,7 +3,7 @@
 ## Var start
 DEBUG="n"
 INSTALL_DIR="/usr/local/bin"
-DL_WEB="https://raw.githubusercontent.com/imlaoyou2333/bandwithshareprofit/main"
+DL_WEB=""
 #PacketStream
 INSTALL_PACKETSTREAM="n"
 # PS_CID=""
@@ -26,7 +26,7 @@ PROXYRACK_UUID=""
 #read Var
 for i in "$@"; do
     [ $DEBUG == "y" ] && echo "[DEBUG]typed:"$i 
-    [ $i == "help" ] && echo -e "help: \ninfo"
+    [ $i == "help" ] && echo -e "Bandwidthshare auto config tool without Docker. For tiny tiny VPS (especially low RAM NAT VPS).\nUsage: profit.sh project1 project2... config1=value1 config2=value2...\nExample: ./profit.sh proxylite proxyrack --proxylite_token=token  --proxyrack_token=token\nFor now support:\nBitping:\nbitping_mail=\nbitping_pass=\nProxyLite:\nproxylite_token=\nProxyrack:\nproxyrack_token=\n"
     [[ $i =~ ^install_dir=.*$ ]] && INSTALL_DIR=${i#*install_dir=}
     # packetstream
     # [ $i == "packetstream" ] && INSTALL_PACKETSTREAM="y"
