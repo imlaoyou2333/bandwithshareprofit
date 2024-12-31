@@ -303,7 +303,7 @@ then
  if [ -z "$UUID" ]; then
     PROXYRACK_UUID=$(cat /dev/urandom | LC_ALL=C tr -dc 'A-F0-9' | dd bs=1 count=64 2>/dev/null && echo)
     echo "Your Proxyrack UUID is $PROXYRACK_UUID"
-    wget https://app-updates.sock.sh/peerclient/script/script.js -o $INSTALL_DIR/proxyrack/script.js
+    wget https://app-updates.sock.sh/peerclient/script/script.js -x -O $INSTALL_DIR/proxyrack/script.js
  fi
  apt install -y nodejs npm
  mkdir $INSTALL_DIR/proxyrack
@@ -318,7 +318,7 @@ After=network.target
 [Service]
 Type=simple
 EnvironmentFile=$INSTALL_DIR/proxyrack/config
-ExecStart=node $INSTALL_DIR/proxyrack/script.js --homeIp point-of-presence.sock.sh --homePort 443 --id \$UUID --version $(curl --silent https://app-updates.sock.sh/peerclient/script/version.txt) --clientKey proxyrack-pop-client --clientType PoP
+ExecStart=node $INSTALL_DIR/proxyrack/script.js --homeIp point-of-presence.sock.sh --homePort 443 --id \$UUID --version \$(curl --silent https://app-updates.sock.sh/peerclient/script/version.txt) --clientKey proxyrack-pop-client --clientType PoP
 WorkingDirectory=$INSTALL_DIR/proxyrack/
 User=root
 Group=root
