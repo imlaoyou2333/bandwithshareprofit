@@ -23,10 +23,14 @@ INSTALL_PROXYRACK="n"
 PROXYRACK_UUID=""
 ## Var end
 
+#Help
+for i in "$@"; do
+[ $i == "help" ] && echo -e "Bandwidthshare auto config tool without Docker. For tiny tiny VPS (especially low RAM NAT VPS).\nUsage: profit.sh project1 project2... config1=value1 config2=value2...\nExample: ./profit.sh proxylite proxyrack --proxylite_token=token  --proxyrack_token=token\nFor now support:\nBitping:\nbitping_mail=\nbitping_pass=\nProxyLite:\nproxylite_token=\nProxyrack:\nproxyrack_token=\n" && exit 0
+done
+
 #read Var
 for i in "$@"; do
     [ $DEBUG == "y" ] && echo "[DEBUG]typed:"$i 
-    [ $i == "help" ] && echo -e "Bandwidthshare auto config tool without Docker. For tiny tiny VPS (especially low RAM NAT VPS).\nUsage: profit.sh project1 project2... config1=value1 config2=value2...\nExample: ./profit.sh proxylite proxyrack --proxylite_token=token  --proxyrack_token=token\nFor now support:\nBitping:\nbitping_mail=\nbitping_pass=\nProxyLite:\nproxylite_token=\nProxyrack:\nproxyrack_token=\n"
     [[ $i =~ ^install_dir=.*$ ]] && INSTALL_DIR=${i#*install_dir=}
     # packetstream
     # [ $i == "packetstream" ] && INSTALL_PACKETSTREAM="y"
