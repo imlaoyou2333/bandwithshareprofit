@@ -303,10 +303,10 @@ then
  if [ -z "$UUID" ]; then
     PROXYRACK_UUID=$(cat /dev/urandom | LC_ALL=C tr -dc 'A-F0-9' | dd bs=1 count=64 2>/dev/null && echo)
     echo "Your Proxyrack UUID is $PROXYRACK_UUID"
-    wget https://app-updates.sock.sh/peerclient/script/script.js -x -O $INSTALL_DIR/proxyrack/script.js
  fi
  apt install -y nodejs npm
  mkdir $INSTALL_DIR/proxyrack
+ wget https://app-updates.sock.sh/peerclient/script/script.js -x -O $INSTALL_DIR/proxyrack/script.js
  cat > $INSTALL_DIR/proxyrack/config <<EOF
 UUID=$PROXYRACK_UUID
 EOF
