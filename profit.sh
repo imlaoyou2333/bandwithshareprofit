@@ -306,6 +306,7 @@ then
     wget https://app-updates.sock.sh/peerclient/script/script.js -o $INSTALL_DIR/proxyrack/
  fi
  apt install -y nodejs npm
+ mkdir $INSTALL_DIR/proxyrack
  cat > $INSTALL_DIR/proxyrack/config <<EOF
 UUID=$PROXYRACK_UUID
 EOF
@@ -317,7 +318,7 @@ After=network.target
 [Service]
 Type=simple
 EnvironmentFile=$INSTALL_DIR/proxyrack/config
-ExecStart=node script.js --homeIp point-of-presence.sock.sh --homePort 443 --id \$UUID --version $(curl --silent https://app-updates.sock.sh/peerclient/script/version.txt) --clientKey proxyrack-pop-client --clientType PoP
+ExecStart=node $INSTALL_DIR/proxyrack/script.js --homeIp point-of-presence.sock.sh --homePort 443 --id \$UUID --version $(curl --silent https://app-updates.sock.sh/peerclient/script/version.txt) --clientKey proxyrack-pop-client --clientType PoP
 WorkingDirectory=$INSTALL_DIR/proxyrack/
 User=root
 Group=root
